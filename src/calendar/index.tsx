@@ -93,28 +93,19 @@ const Calendar = (props: CalendarProps & ContextProp) => {
     testID,
     style: propsStyle
   } = props;
-  const [currentMonth, setCurrentMonth] = useState(current || initialDate ? parseDate(current || initialDate) : new XDate());
+  const [internalCurrentMonth, setCurrentMonth] = useState<XDate>(current || initialDate ? parseDate(current || initialDate) : new XDate());
+  const currentMonth = useMemo(() => current ? parseDate(current) : internalCurrentMonth, [current, internalCurrentMonth]);
   const style = useRef(styleConstructor(theme));
   const header = useRef();
   const weekNumberMarking = useRef({disabled: true, disableTouchEvent: true});
-
-  useEffect(() => {
-    if (initialDate) {
-      setCurrentMonth(parseDate(initialDate));
-    }
-  }, [initialDate]);
-
-  useDidUpdate(() => {
-    const _currentMonth = currentMonth.clone();
-    onMonthChange?.(xdateToData(_currentMonth));
-    onVisibleMonthsChange?.([xdateToData(_currentMonth)]);
-  }, [currentMonth]);
 
   const updateMonth = useCallback((newMonth: XDate) => {
     if (sameMonth(newMonth, currentMonth)) {
       return;
     }
     setCurrentMonth(newMonth);
+    onMonthChange?.(xdateToData(newMonth));
+    onVisibleMonthsChange?.([xdateToData(newMonth)]);
   }, [currentMonth]);
 
   const addMonth = useCallback((count: number) => {
