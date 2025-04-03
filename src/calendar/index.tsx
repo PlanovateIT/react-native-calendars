@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import XDate from 'xdate';
 import isEmpty from 'lodash/isEmpty';
 import React, {useRef, useState, useEffect, useCallback, useMemo} from 'react';
-import {View, ViewStyle, StyleProp} from 'react-native';
+import {NativePointerEvent, NativeSyntheticEvent, View, ViewStyle, StyleProp} from 'react-native';
 // @ts-expect-error
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import constants from '../commons/constants';
@@ -38,6 +38,12 @@ export interface CalendarProps extends CalendarHeaderProps, DayProps {
   hideExtraDays?: boolean;
   /** Always show six weeks on each month (only when hideExtraDays = false) */
   showSixWeeks?: boolean;
+  /** Handler which gets executed on day draw */
+  onDayDraw?: (date: DateData) => void;
+  /** Handler which gets executed on day pointer down */
+  onDayDown?: (date: DateData, e: NativeSyntheticEvent<NativePointerEvent>) => void;
+  /** Handler which gets executed on day pointer up */
+  onDayUp?: (date: DateData, e: NativeSyntheticEvent<NativePointerEvent>) => void;
   /** Handler which gets executed on day press */
   onDayPress?: (date: DateData) => void;
   /** Handler which gets executed on day long press */
@@ -76,6 +82,9 @@ const Calendar = (props: CalendarProps & ContextProp) => {
     minDate,
     maxDate,
     allowSelectionOutOfRange,
+    onDayDraw,
+    onDayDown,
+    onDayUp,
     onDayPress,
     onDayLongPress,
     onMonthChange,
@@ -188,8 +197,28 @@ const Calendar = (props: CalendarProps & ContextProp) => {
     const dateString = toMarkingFormat(day);
     const isControlled = isEmpty(props.context);
 
+    const handleDraw = (e: NativeSyntheticEvent<NativePointerEvent>) => {
+      if (e.nativeEvent.buttons === 1) {
+        onDayDraw?.(xdateToData(day));
+      }
+    };
+
+    const handleDown = (e: NativeSyntheticEvent<NativePointerEvent>) => {
+      onDayDown?.(xdateToData(day), e);
+    };
+
+    const handleUp = (e: NativeSyntheticEvent<NativePointerEvent>) => {
+      onDayUp?.(xdateToData(day), e);
+    };
+
     return (
-      <View style={style.current.dayContainer} key={id}>
+      <View
+        style={style.current.dayContainer}
+        key={id}
+        onPointerDown={handleDown}
+        onPointerMove={handleDraw}
+        onPointerUp={handleUp}
+      >
         <Day
           {...dayProps}
           testID={`${testID}.day_${dateString}`}
@@ -198,6 +227,8 @@ const Calendar = (props: CalendarProps & ContextProp) => {
           marking={markedDates?.[dateString]}
           onPress={_onDayPress}
           onLongPress={onLongPressDay}
+          onPointerDown={handleDraw}
+          onPointerMove={handleDraw}
         />
       </View>
     );
