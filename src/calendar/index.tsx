@@ -18,6 +18,7 @@ import Day, {DayProps} from './day/index';
 import BasicDay from './day/basic';
 
 export interface CalendarProps extends CalendarHeaderProps, DayProps {
+  className?: string;
   /** Specify theme properties to override specific styles for calendar parts */
   theme?: Theme;
   /** Specify style for calendar container element */
@@ -75,6 +76,7 @@ export interface CalendarProps extends CalendarHeaderProps, DayProps {
  */
 const Calendar = (props: CalendarProps & ContextProp) => {
   const {
+    className,
     initialDate,
     current,
     theme,
@@ -299,7 +301,7 @@ const Calendar = (props: CalendarProps & ContextProp) => {
   const gestureProps = enableSwipeMonths ? swipeProps : undefined;
 
   return (
-    <GestureComponent {...gestureProps} testID={`${testID}.container`}>
+    <GestureComponent {...gestureProps} testID={`${testID}.container`} className={className}>
       <View
         style={[style.current.container, propsStyle]}
         testID={testID}
