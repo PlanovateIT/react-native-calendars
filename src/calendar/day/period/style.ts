@@ -12,14 +12,16 @@ export default function styleConstructor(theme: Theme = {}) {
       alignItems: 'center'
     },
     base: {
-      width: 38,
+      width: 34,
       height: FILLER_HEIGHT,
       alignItems: 'center',
       justifyContent: 'center'
     },
     today: {
       backgroundColor: appStyle.todayBackgroundColor,
-      borderRadius: 17
+      borderRadius: 17,
+      borderWidth: appStyle.todayBorderWidth,
+      borderColor: appStyle.todayBorderColor
     },
 
     fillers: {

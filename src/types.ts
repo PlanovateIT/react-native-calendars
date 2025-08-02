@@ -66,6 +66,8 @@ export interface Theme {
   dotStyle?: object;
   arrowStyle?: ViewStyle;
   todayBackgroundColor?: string;
+  todayBorderWidth?: number;
+  todayBorderColor?: string;
   disabledDotColor?: string;
   inactiveDotColor?: string;
   todayDotColor?: string;
